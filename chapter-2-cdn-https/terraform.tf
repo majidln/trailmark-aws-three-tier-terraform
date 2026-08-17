@@ -4,9 +4,9 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "trailmark-state-backend"
-    key    = "chapter-2-cdn-https/terraform.tfstate"
-    region = "us-east-1"
+    bucket       = "trailmark-state-backend"
+    key          = "chapter-2-cdn-https/terraform.tfstate"
+    region       = "us-east-1"
     use_lockfile = true
   }
   required_providers {
