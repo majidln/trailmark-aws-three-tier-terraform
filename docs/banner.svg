@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="t d">
+  <title id="t">Abstract banner</title>
+  <desc id="d">Three layered mountain ridges under a night sky of connected stars, with a glowing trail of three waypoints winding up toward a sunrise.</desc>
+  <defs>
+    <clipPath id="frame"><rect width="1200" height="400" rx="18"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#070b1a"/>
+      <stop offset="0.55" stop-color="#1a2147"/>
+      <stop offset="1" stop-color="#4a2f5f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffb36b" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#ff7a59" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ff7a59" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff0c9"/>
+      <stop offset="1" stop-color="#ff8a5c"/>
+    </linearGradient>
+    <linearGradient id="ridge1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34447f"/>
+      <stop offset="1" stop-color="#1f2a58"/>
+    </linearGradient>
+    <linearGradient id="ridge2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232f63"/>
+      <stop offset="1" stop-color="#141d44"/>
+    </linearGradient>
+    <linearGradient id="ridge3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141c45"/>
+      <stop offset="1" stop-color="#090e24"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="1" stop-color="#ffd29a"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1200" height="400" fill="url(#sky)"/>
+    <ellipse cx="820" cy="235" rx="470" ry="170" fill="url(#glow)"/>
+
+    <!-- constellation: stars joined into a loose network -->
+    <g stroke="#8fb4ff" stroke-width="1" fill="none" opacity="0.35">
+      <polyline points="90,60 170,112 260,55 340,122 430,70 520,106 600,46 700,82"/>
+      <polyline points="900,120 985,70 1062,112 1135,56"/>
+      <line x1="170" y1="112" x2="200" y2="172"/>
+      <line x1="520" y1="106" x2="560" y2="168"/>
+    </g>
+    <g fill="#d6e4ff">
+      <circle cx="90" cy="60" r="3"/><circle cx="170" cy="112" r="2.5"/><circle cx="260" cy="55" r="3.5"/>
+      <circle cx="340" cy="122" r="2.5"/><circle cx="430" cy="70" r="3"/><circle cx="520" cy="106" r="3.5"/>
+      <circle cx="600" cy="46" r="2.5"/><circle cx="700" cy="82" r="3"/><circle cx="900" cy="120" r="2.5"/>
+      <circle cx="985" cy="70" r="3.5"/><circle cx="1062" cy="112" r="2.5"/><circle cx="1135" cy="56" r="3"/>
+      <circle cx="200" cy="172" r="2" opacity="0.7"/><circle cx="560" cy="168" r="2" opacity="0.7"/>
+      <circle cx="40" cy="120" r="1.5" opacity="0.6"/><circle cx="780" cy="40" r="1.5" opacity="0.6"/>
+      <circle cx="1170" cy="150" r="1.5" opacity="0.6"/><circle cx="470" cy="30" r="1.5" opacity="0.6"/>
+      <circle cx="320" cy="170" r="1.5" opacity="0.5"/><circle cx="1010" cy="170" r="1.5" opacity="0.5"/>
+    </g>
+
+    <!-- sun and signal rings -->
+    <g fill="none" stroke="#ffb36b">
+      <circle cx="820" cy="215" r="105" opacity="0.28"/>
+      <circle cx="820" cy="215" r="145" opacity="0.18"/>
+      <circle cx="820" cy="215" r="190" opacity="0.10"/>
+    </g>
+    <circle cx="820" cy="215" r="72" fill="url(#sun)"/>
+
+    <!-- three ridges, one per tier -->
+    <path d="M0 260 C120 200 200 170 300 215 C390 255 450 190 560 150 C650 118 720 190 800 215 C900 245 980 160 1080 150 C1140 144 1180 180 1200 190 L1200 400 L0 400 Z"
+          fill="url(#ridge1)" stroke="#6f8ae0" stroke-opacity="0.55" stroke-width="1.5"/>
+    <path d="M0 320 C100 280 220 250 330 290 C430 325 500 270 610 245 C720 220 790 285 900 290 C1010 295 1100 240 1200 255 L1200 400 L0 400 Z"
+          fill="url(#ridge2)" stroke="#5a74cc" stroke-opacity="0.5" stroke-width="1.5"/>
+    <path d="M0 370 C140 340 260 335 380 358 C500 380 620 335 760 342 C900 350 1020 385 1200 350 L1200 400 L0 400 Z"
+          fill="url(#ridge3)" stroke="#4a62b8" stroke-opacity="0.45" stroke-width="1.5"/>
+
+    <!-- the trail -->
+    <path d="M60 392 C180 360 250 380 330 340 S430 270 520 262 S650 235 720 215 S790 200 818 200"
+          fill="none" stroke="url(#trail)" stroke-width="7" stroke-linecap="round" opacity="0.45" filter="url(#soft)"/>
+    <path d="M60 392 C180 360 250 380 330 340 S430 270 520 262 S650 235 720 215 S790 200 818 200"
+          fill="none" stroke="url(#trail)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 9"/>
+    <g>
+      <circle cx="330" cy="340" r="15" fill="#5eead4" opacity="0.25"/><circle cx="330" cy="340" r="5.5" fill="#d9fff7"/>
+      <circle cx="520" cy="262" r="15" fill="#9be7c4" opacity="0.25"/><circle cx="520" cy="262" r="5.5" fill="#f1ffe9"/>
+      <circle cx="720" cy="215" r="15" fill="#ffd29a" opacity="0.28"/><circle cx="720" cy="215" r="5.5" fill="#fff6e3"/>
+    </g>
+  </g>
+</svg>

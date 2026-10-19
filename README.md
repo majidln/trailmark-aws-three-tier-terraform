@@ -1,6 +1,6 @@
 # AWS Three-Tier Architecture with Terraform
 
-![AWS three-tier architecture: internet to ALB, Auto Scaling Group and RDS Postgres across public, private and isolated subnets](docs/architecture.svg)
+![Abstract banner: three layered ridges under a connected night sky, with a glowing trail winding up toward the sunrise](docs/banner.svg)
 
 A three-tier application stack on AWS, written as reusable Terraform modules, deployed as separate `dev` and `prod` environments, with infrastructure changes reviewed and applied through GitHub Actions and no stored AWS credentials.
 
