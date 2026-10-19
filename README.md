@@ -1,4 +1,4 @@
-# Trailmark: three-tier AWS infrastructure with Terraform
+# AWS Three-Tier Architecture with Terraform
 
 A three-tier application stack on AWS, written as reusable Terraform modules, deployed as separate `dev` and `prod` environments, with infrastructure changes reviewed and applied through GitHub Actions and no stored AWS credentials.
 
