@@ -20,7 +20,10 @@ override.tf.json
 # non-sensitive sizing files used by this workspace exercise.
 *.tfvars
 *.tfvars.json
-!workspace-lab/dev.tfvars
-!workspace-lab/prod.tfvars
+!envs/dev.tfvars
+!envs/prod.tfvars
 
 # Keep .terraform.lock.hcl committed: it pins provider checksums and versions.
+
+# Terraform debug output
+tf-debug.log

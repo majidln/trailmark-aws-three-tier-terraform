@@ -25,7 +25,7 @@ variable "state_bucket" {
 variable "github_repo" {
   type        = string
   description = "GitHub repo allowed to assume these roles, as it appears in the token's sub claim"
-  default     = "majidln@8521168/aws-saa-leaning-projects@1326414898"
+  default     = "majidln@8521168/trailmark-aws-three-tier-terraform@1421722328"
 
   validation {
     condition     = can(regex("^[^/*]+/[^/*]+$", var.github_repo))

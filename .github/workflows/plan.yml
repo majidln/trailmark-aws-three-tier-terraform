@@ -1,10 +1,10 @@
-name: Chapter 5 Plan
+name: Terraform Plan
 
 on:
   pull_request:
     paths:
-      - 'trailmark/chapter-5-pipeline/**'
-      - '.github/workflows/chapter-5-plan.yml'
+      - 'pipeline/**'
+      - '.github/workflows/plan.yml'
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: trailmark/chapter-5-pipeline/stack
+        working-directory: pipeline/stack
 
     name: Terraform Plan
     runs-on: ubuntu-latest
