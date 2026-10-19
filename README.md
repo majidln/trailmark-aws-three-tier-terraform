@@ -1,5 +1,7 @@
 # AWS Three-Tier Architecture with Terraform
 
+![AWS three-tier architecture: internet to ALB, Auto Scaling Group and RDS Postgres across public, private and isolated subnets](docs/architecture.svg)
+
 A three-tier application stack on AWS, written as reusable Terraform modules, deployed as separate `dev` and `prod` environments, with infrastructure changes reviewed and applied through GitHub Actions and no stored AWS credentials.
 
 Trailmark is the scenario: a startup that publishes hiking trail guides and needs a trail-search backend whose database is never reachable from the internet.

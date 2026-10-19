@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="title desc" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="title">AWS three-tier architecture</title>
+  <desc id="desc">Internet traffic reaches an Application Load Balancer in public subnets, which forwards to an Auto Scaling Group of EC2 instances in private subnets, which connect to an RDS Postgres database in isolated subnets. Database credentials come from Secrets Manager and outbound traffic leaves through a NAT gateway.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0 0 L10 4 L0 8 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="958" height="498" rx="14" fill="#f8fafc" stroke="#e2e8f0"/>
+
+  <text x="480" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">AWS Three-Tier Architecture</text>
+  <text x="480" y="62" text-anchor="middle" font-size="13" fill="#475569">Terraform modules · dev and prod workspaces · CI/CD with GitHub OIDC</text>
+
+  <!-- Internet -->
+  <rect x="20" y="215" width="100" height="60" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="70" y="251" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a">Internet</text>
+
+  <!-- VPC -->
+  <rect x="150" y="85" width="750" height="370" rx="12" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="166" y="107" font-size="12" fill="#475569">VPC · 2 Availability Zones · us-east-1</text>
+
+  <!-- Tier 1: presentation -->
+  <rect x="170" y="120" width="210" height="240" rx="10" fill="#e0efff" stroke="#60a5fa"/>
+  <text x="275" y="143" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a">Presentation</text>
+  <text x="275" y="160" text-anchor="middle" font-size="11" fill="#1e40af">Public subnets</text>
+
+  <rect x="195" y="185" width="160" height="64" rx="8" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="275" y="210" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Application</text>
+  <text x="275" y="225" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Load Balancer</text>
+  <text x="275" y="241" text-anchor="middle" font-size="11" fill="#475569">HTTP :80</text>
+
+  <rect x="195" y="285" width="160" height="48" rx="8" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="275" y="306" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">NAT gateway</text>
+  <text x="275" y="322" text-anchor="middle" font-size="11" fill="#475569">outbound only</text>
+
+  <!-- Tier 2: application -->
+  <rect x="420" y="120" width="210" height="240" rx="10" fill="#e3f6e8" stroke="#4ade80"/>
+  <text x="525" y="143" text-anchor="middle" font-size="14" font-weight="700" fill="#14532d">Application</text>
+  <text x="525" y="160" text-anchor="middle" font-size="11" fill="#166534">Private subnets</text>
+
+  <rect x="445" y="180" width="160" height="140" rx="8" fill="#ffffff" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="525" y="199" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Auto Scaling Group</text>
+  <rect x="460" y="212" width="130" height="40" rx="6" fill="#f0fdf4" stroke="#22c55e"/>
+  <text x="525" y="229" text-anchor="middle" font-size="12" fill="#0f172a">EC2 instance</text>
+  <text x="525" y="244" text-anchor="middle" font-size="11" fill="#475569">app :8080</text>
+  <rect x="460" y="262" width="130" height="40" rx="6" fill="#f0fdf4" stroke="#22c55e"/>
+  <text x="525" y="279" text-anchor="middle" font-size="12" fill="#0f172a">EC2 instance</text>
+  <text x="525" y="294" text-anchor="middle" font-size="11" fill="#475569">app :8080</text>
+
+  <!-- Tier 3: data -->
+  <rect x="670" y="120" width="210" height="240" rx="10" fill="#fff1e0" stroke="#fb923c"/>
+  <text x="775" y="143" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12">Data</text>
+  <text x="775" y="160" text-anchor="middle" font-size="11" fill="#9a3412">Isolated subnets</text>
+
+  <rect x="705" y="200" width="140" height="80" rx="8" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="775" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">RDS Postgres</text>
+  <text x="775" y="252" text-anchor="middle" font-size="11" fill="#475569">:5432</text>
+
+  <!-- Secrets Manager -->
+  <rect x="445" y="385" width="160" height="44" rx="8" fill="#ffffff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="525" y="412" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">Secrets Manager</text>
+
+  <!-- Flows -->
+  <g stroke="#334155" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M120 245 L195 217"/>
+    <path d="M355 217 L445 217"/>
+    <path d="M605 250 L705 240"/>
+    <path d="M525 320 L525 385"/>
+  </g>
+  <g stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="5 4" marker-end="url(#arrow)">
+    <path d="M445 305 L355 309"/>
+    <path d="M195 309 L70 309 L70 275"/>
+  </g>
+  <text x="535" y="358" font-size="11" fill="#475569">DB credentials</text>
+
+  <text x="480" y="482" text-anchor="middle" font-size="12" fill="#334155">Security groups chain by reference (ALB SG → App SG → DB SG): the database is reachable only from the app tier.</text>
+</svg>
