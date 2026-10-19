@@ -1,24 +1,24 @@
-# Chapter 4 — Environments (dev / prod)
+# Environments (dev / prod)
 
-The Chapter 3 three-tier stack, stood up twice from one set of modules. `dev` and `prod` are **Terraform workspaces** against a single root config, not separate directories.
+The three-tier stack, stood up twice from one set of modules. `dev` and `prod` are **Terraform workspaces** against a single root config, not separate directories.
 
-See [CHAPTER-4-GUIDE.md](../CHAPTER-4-GUIDE.md) for why, and what that choice costs.
+See [docs/decisions.md](../docs/decisions.md) for why, and what that choice costs.
 
 ---
 
 ## Layout
 
 ```
-chapter-4-envs/
-  modules/network/        VPC, subnets, IGW, NAT, route tables
-  modules/app-tier/       ALB, ASG, launch template, IAM, security groups
-  modules/db-tier/        RDS Postgres, subnet group, Secrets Manager
-  workspace-lab/          the only root config — run every command from here
-    main.tf               module wiring + outputs
-    terraform.tf          provider, S3 backend, version pins
-    variables.tf
-    dev.tfvars
-    prod.tfvars
+envs/                     the only root config — run every command from here
+  main.tf                 module wiring + outputs
+  terraform.tf            provider, S3 backend, version pins
+  variables.tf
+  dev.tfvars
+  prod.tfvars
+modules/                  shared by every environment
+  network/                VPC, subnets, IGW, NAT, route tables
+  app-tier/               ALB, ASG, launch template, IAM, security groups
+  db-tier/                RDS Postgres, subnet group, Secrets Manager
 ```
 
 ---
@@ -40,10 +40,10 @@ State lives in `s3://trailmark-state-backend`, key `chapter-4-envs/terraform.tfs
 
 ## Run it
 
-All commands run from `workspace-lab/`.
+All commands run from `envs/`.
 
 ```bash
-cd workspace-lab
+cd envs
 terraform init
 ```
 

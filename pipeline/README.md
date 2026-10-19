@@ -1,8 +1,8 @@
-# Chapter 5 — CI/CD Pipeline (OIDC, no stored credentials)
+# CI/CD Pipeline (OIDC, no stored credentials)
 
 Terraform runs in GitHub Actions instead of on a laptop. A pull request posts a `terraform plan`; a merge to `main` runs `terraform apply`. AWS authentication uses GitHub's OIDC provider — there are **no AWS access keys** stored in GitHub, and none needed except for the one-time bootstrap.
 
-See [CHAPTER-5-GUIDE.md](../CHAPTER-5-GUIDE.md) for the reasoning behind each decision.
+See [docs/decisions.md](../docs/decisions.md) for the reasoning behind each decision.
 
 ---
 
@@ -10,15 +10,15 @@ See [CHAPTER-5-GUIDE.md](../CHAPTER-5-GUIDE.md) for the reasoning behind each de
 
 ```
 .github/workflows/                    <- repo root; GitHub reads workflows only from here
-  chapter-5-plan.yml                  runs on pull_request
-  chapter-5-apply.yml                 runs on push to main
+  plan.yml                            runs on pull_request
+  apply.yml                           runs on push to main
 
-trailmark/chapter-5-pipeline/
+pipeline/
   bootstrap/    OIDC provider + the two IAM roles   — you apply this by hand
   stack/        one versioned S3 bucket             — the pipeline applies this
 ```
 
-The workflow files cannot live inside this directory: GitHub only reads `.github/workflows/` at the repo root. That makes this the one chapter that isn't fully self-contained.
+The workflow files cannot live inside this directory: GitHub only reads `.github/workflows/` at the repo root. That makes this the one folder that isn't fully self-contained.
 
 ---
 
@@ -77,7 +77,7 @@ Variables rather than secrets on purpose: a role ARN is an address, not a creden
 
 ## The everyday loop
 
-Nothing to run locally. Change something under `trailmark/chapter-5-pipeline/**` and:
+Nothing to run locally. Change something under `pipeline/**` and:
 
 1. Open a pull request → the plan workflow authenticates as the **plan role**, runs `terraform plan`, and posts the output as a PR comment
 2. Read the plan
