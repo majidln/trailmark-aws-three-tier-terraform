@@ -394,6 +394,59 @@ resource "aws_autoscaling_group" "app_asg" {
 
 The ASG gives the tier a size range and self-healing, but this project does not yet have a scaling policy, so the instance count changes only when it is changed in code or when an instance fails. Scaling on load, for example target tracking on CPU or on requests per target, is a natural next step.
 
+## 3. The database tier
+
+The third tier is the database, PostgreSQL on Amazon RDS. It sits in the isolated subnets, which have no route to the internet in either direction, and it accepts connections from the app tier only.
+
+### 3.1 The database security group
+
+The database has its own security group, and its only ingress rule names the app tier's security group as the source, on the database port (`5432`):
+
+```hcl
+resource "aws_security_group" "db_sg" {
+  name        = "${var.prefix}-db-sg"
+  description = "Allow traffic from the app tier"
+  vpc_id      = var.vpc_id
+
+  tags = { ... }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_ingress_rule" {
+  security_group_id            = aws_security_group.db_sg.id
+  referenced_security_group_id = var.app_sg
+
+  ip_protocol = "tcp"
+  from_port   = var.db_port
+  to_port     = var.db_port
+}
+```
+
+- Only instances that carry the app security group can open a connection to the database. Nothing else in the VPC can, including the load balancer, and nothing from the internet can.
+- This is the same chaining as in the other tiers: the ALB's security group admits the internet, the app security group admits only the ALB, and the db security group admits only the app tier. Each tier trusts only the one above it.
+- The group has no egress rule. Terraform removes the allow-all outbound rule that AWS adds by default, and a database that only answers connections does not need to start any. Replies to allowed connections go out automatically, because security groups are stateful.
+
+### 3.2 The database subnet group
+
+RDS places the instance through a subnet group, a list of subnets it may use. This one holds the isolated db subnets, one per AZ:
+
+```hcl
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = "${var.prefix}-db-subnet-group"
+  subnet_ids = var.db_subnet_ids
+
+  tags = { ... }
+}
+```
+
+RDS requires the subnets to cover at least two AZs, which the network layer provides. The instance lands in one of these subnets, and the isolated subnets have no route to a NAT gateway or an internet gateway, so the database cannot be reached from the internet and cannot reach it.
+
+A single database instance lives in one subnet, so in one AZ, and RDS picks that subnet from the group. The other db subnets are still useful, because they are where more database instances can go:
+
+- **A standby (Multi-AZ).** RDS keeps a synchronous copy in a second AZ and fails over to it automatically. It is there for availability and does not serve queries.
+- **Read replicas.** Separate instances that copy the data asynchronously and serve read-only queries, which spreads read load. A replica can also be promoted to a primary.
+
+This project runs a single primary (`multi_az = false`) with no replicas, to keep the cost down. Turning on Multi-AZ, at least in prod, is a one-line change, because the subnet group already spans two AZs.
+
 ## Good to know
 
 - The snippets are shortened: `tags = { ... }` stands for the resource's tags. The full code is in the source files.
