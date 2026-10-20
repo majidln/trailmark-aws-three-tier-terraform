@@ -21,15 +21,14 @@ module "app-tier" {
 }
 
 module "db-tier" {
-  source                  = "./../modules/db-tier"
-  prefix                  = var.prefix
-  vpc_id                  = module.network.vpc_id
-  app_sg                  = module.app-tier.app_sg
-  db_subnet_ids           = module.network.db_subnet_ids
-  db_port                 = var.db_port
-  environment             = terraform.workspace
-  recovery_window_in_days = var.recovery_window_in_days
-  db_instance_class       = var.db_instance_class
+  source            = "./../modules/db-tier"
+  prefix            = var.prefix
+  vpc_id            = module.network.vpc_id
+  app_sg            = module.app-tier.app_sg
+  db_subnet_ids     = module.network.db_subnet_ids
+  db_port           = var.db_port
+  environment       = terraform.workspace
+  db_instance_class = var.db_instance_class
 }
 
 output "alb_dns" {
