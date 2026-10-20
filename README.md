@@ -10,6 +10,8 @@ We use Terraform, an infrastructure-as-code (IaC) tool, to build the whole solut
 
 The network is the foundation of the architecture: a VPC, subnets for each tier, and routing that decides what can reach what.
 
+![AWS three-tier network architecture diagram: a VPC in us-east-1 with two Availability Zones, each with a public, a private app and an isolated database subnet, plus an internet gateway, NAT gateways and route tables](docs/network-layer.svg)
+
 ### 1.1 The VPC
 
 Everything starts with the VPC, the private network that all three tiers live in (`modules/network/main.tf`):
