@@ -6,6 +6,36 @@ N-tier architecture is a classic way to design software systems. The application
 
 We use Terraform, an infrastructure-as-code (IaC) tool, to build the whole solution, so every resource below is declared in code, reviewed in pull requests and reproducible.
 
+This is what we build, step by step: the network, then the app tier, then the database. Click the diagram to see it full size.
+
+![AWS three-tier architecture diagram: a VPC in us-east-1 across two Availability Zones with an internet-facing Application Load Balancer in the public subnets, EC2 instances in an Auto Scaling group in the private subnets and an RDS PostgreSQL database in an isolated subnet, connected through chained security groups, an internet gateway and NAT gateways](docs/db-tier-network.svg)
+
+## Table of contents
+
+- [1. The network layer](#1-the-network-layer)
+  - [1.1 The VPC](#11-the-vpc)
+  - [1.2 The subnets](#12-the-subnets)
+  - [1.3 Internet access for the public subnets](#13-internet-access-for-the-public-subnets)
+  - [1.4 NAT gateways for the private subnets](#14-nat-gateways-for-the-private-subnets)
+  - [1.5 Routing the app subnets through the NAT](#15-routing-the-app-subnets-through-the-nat)
+- [2. The app tier](#2-the-app-tier)
+  - [2.1 The load balancer and its security group](#21-the-load-balancer-and-its-security-group)
+  - [2.2 The listener and the target group](#22-the-listener-and-the-target-group)
+  - [2.3 The app security group](#23-the-app-security-group)
+  - [2.4 The instance role and the link to the database](#24-the-instance-role-and-the-link-to-the-database)
+  - [2.5 The launch template](#25-the-launch-template)
+  - [2.6 The Auto Scaling Group](#26-the-auto-scaling-group)
+- [3. The database tier](#3-the-database-tier)
+  - [3.1 The database security group](#31-the-database-security-group)
+  - [3.2 The database subnet group](#32-the-database-subnet-group)
+- [Good to know](#good-to-know)
+- [Next steps](#next-steps)
+- [How to run it](#how-to-run-it)
+  - [1. Create the state bucket](#1-create-the-state-bucket)
+  - [2. Deploy an environment](#2-deploy-an-environment)
+  - [3. Check that it works](#3-check-that-it-works)
+  - [4. Tear it down](#4-tear-it-down)
+
 ## 1. The network layer
 
 The network is the foundation of the architecture: a VPC, subnets for each tier, and routing that decides what can reach what.
@@ -163,6 +193,8 @@ The db subnets get no route to a NAT gateway or an internet gateway, so the data
 ## 2. The app tier
 
 The second tier is the app tier, the backend of the architecture. It handles the requests that come from users and talks to the database tier. It is never exposed to the internet directly: the app instances live in the private subnets, with no public IP and no route from the internet gateway. They can only be reached through a load balancer.
+
+![AWS app tier architecture diagram: an internet-facing Application Load Balancer in the public subnets forwards traffic to EC2 instances in an Auto Scaling group across two private subnets, protected by chained security groups and reaching the internet through NAT gateways](docs/app-tier-network.svg)
 
 ### 2.1 The load balancer and its security group
 
@@ -466,3 +498,60 @@ This project runs a single primary (`multi_az = false`) with no replicas, to kee
 - **A newer base image.** The launch template uses Amazon Linux 2. Moving to Amazon Linux 2023 is worth doing, and the end-of-support date of Amazon Linux 2 should be checked.
 - **Database connection details.** The RDS-managed secret holds only the username and password. The application also needs the host, port and database name. They are available as Terraform outputs and could be passed to the instances, for example through the user data or an SSM parameter.
 - **Instance metadata hardening.** The launch template does not enforce IMDSv2. Requiring it (`metadata_options` with `http_tokens = "required"`) would protect the instance role's credentials from SSRF-style attacks.
+
+## How to run it
+
+You need Terraform `~> 1.15.8` and AWS credentials that can create VPC, EC2, RDS, ELB, IAM and Secrets Manager resources. Everything lives in `us-east-1`.
+
+### 1. Create the state bucket
+
+Terraform keeps its state in an S3 bucket, and the bucket can't create itself, so it is applied once by hand with local state:
+
+```bash
+cd state-backend
+terraform init
+terraform apply
+```
+
+S3 bucket names are global. If `trailmark-state-backend` is taken, change the `bucket` variable in `state-backend/` and the `bucket` in the backend block of `envs/terraform.tf` to the same new name.
+
+### 2. Deploy an environment
+
+`dev` and `prod` are Terraform workspaces of the same configuration in `envs/`:
+
+```bash
+cd envs
+terraform init
+terraform workspace new dev
+terraform apply -var-file=dev.tfvars
+```
+
+The workspace and the `-var-file` are two separate selectors, and nothing checks that they match. Run `terraform workspace show` before every apply. For prod, create the `prod` workspace and use `prod.tfvars`.
+
+The apply takes about 5 to 10 minutes, mostly for the RDS instance and the NAT gateway.
+
+### 3. Check that it works
+
+```bash
+curl http://$(terraform output -raw alb_dns)/health
+```
+
+It should answer `ok`. If it hangs, wait a few minutes: new instances boot, install Python and must pass the health check before the ALB sends them traffic.
+
+The database must not be reachable from your machine:
+
+```bash
+nc -zv $(terraform output -raw db_endpoint) 5432
+```
+
+This should time out, which is the point of the isolated subnets.
+
+### 4. Tear it down
+
+```bash
+terraform destroy -var-file=dev.tfvars
+```
+
+Do this when you are done. The NAT gateways and the RDS instance are billed by the hour.
+
+The `pipeline/` folder is a separate, optional part that sets up GitHub Actions with OIDC. You don't need it to run the three tiers.
