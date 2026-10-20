@@ -28,11 +28,6 @@ variable "environment" {
   description = "Environment name (e.g. dev, prod) — applied as the Environment tag"
 }
 
-variable "recovery_window_in_days" {
-  type        = number
-  description = "The number of days that Secrets Manager waits before it can delete the secret. You can specify a value from 7 to 30 days."
-}
-
 variable "db_instance_class" {
   type        = string
   description = "RDS instance class for the database"

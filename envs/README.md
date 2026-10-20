@@ -100,7 +100,6 @@ Everything below is set in `.tfvars`. No environment-conditional logic lives ins
 | `instance_type` | `t2.micro` | `t3.micro` |
 | `asg_min_size` / `max` / `desired` | 1 / 2 / 1 | 2 / 4 / 2 |
 | `single_nat_gateway` | `true` — one shared | `false` — one per AZ |
-| `recovery_window_in_days` | `0` — instant secret delete | `30` — recoverable |
 | `db_instance_class` | `db.t3.micro` | `db.t3.micro` (deliberate) |
 
 `single_nat_gateway` is the interesting one. Dev routes both app subnets through a single gateway (cross-AZ hop, roughly half the cost). Prod gives each AZ its own, so egress survives an AZ failure.
@@ -110,14 +109,6 @@ Everything below is set in `.tfvars`. No environment-conditional logic lives ins
 ## Gotchas
 
 **The workspace and `-var-file` are two independent selectors.** `workspace select prod` with `-var-file=dev.tfvars` plans cleanly and writes `chapter-4-dev-*` resources into prod's state. Run `terraform workspace show` before any apply.
-
-**Secrets Manager tombstones block re-apply.** `destroy` only *schedules* a secret for deletion; the name stays reserved for the recovery window. Dev sets `recovery_window_in_days = 0` to avoid this. If prod (window `30`) blocks a re-apply:
-
-```bash
-aws secretsmanager delete-secret \
-  --secret-id chapter-4-prod-db-password \
-  --force-delete-without-recovery --region us-east-1
-```
 
 **A failed apply leaves resources running.** The apply is not atomic — a failure partway through can leave a NAT Gateway and RDS instance billing. Check what's actually up before assuming a failed run cost nothing.
 
@@ -132,7 +123,7 @@ aws secretsmanager delete-secret \
 | `app_sg_id` | app security group (the source for RDS ingress) |
 | `db_endpoint` | RDS hostname — private, should fail from your laptop |
 | `db_port` / `db_name` | `5432` / `trailmark` |
-| `db_secret_arn` | Secrets Manager ARN holding the DB credentials |
+| `db_secret_arn` | ARN of the RDS-managed Secrets Manager secret holding the DB master username and password |
 
 ---
 

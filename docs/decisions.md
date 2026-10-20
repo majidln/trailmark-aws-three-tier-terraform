@@ -4,13 +4,13 @@ The reasoning behind the choices in this repo, and what each one costs. The orig
 
 ## Three tiers, isolated by security-group references
 
-The network is a VPC across two AZs with three subnet tiers: public (ALB), private (app, in an Auto Scaling Group) and isolated (RDS Postgres). Each tier accepts traffic only from the security group of the tier above it, by reference rather than by CIDR range, so the database is unreachable from the internet and from anything except the app tier. Database credentials live in Secrets Manager, never in `.tf` files or variables.
+The network is a VPC across two AZs with three subnet tiers: public (ALB), private (app, in an Auto Scaling Group) and isolated (RDS Postgres). Each tier accepts traffic only from the security group of the tier above it, by reference rather than by CIDR range, so the database is unreachable from the internet and from anything except the app tier. The database master password is generated and stored in Secrets Manager by RDS itself (`manage_master_user_password`), so it is never in `.tf` files, variables or Terraform state.
 
 The three tiers are separate modules (`modules/network`, `modules/app-tier`, `modules/db-tier`) composed once per environment in `envs/`.
 
 ## Dev and prod: Terraform workspaces, one root config
 
-`envs/` is a single root config; `dev` and `prod` are workspaces, with sizing in `dev.tfvars` and `prod.tfvars`. Dev uses one NAT gateway and a single app instance; prod uses a NAT gateway per AZ, two to four instances and a 30-day secret recovery window.
+`envs/` is a single root config; `dev` and `prod` are workspaces, with sizing in `dev.tfvars` and `prod.tfvars`. Dev uses one NAT gateway and a single app instance; prod uses a NAT gateway per AZ, two to four instances.
 
 **What it costs.** Two independent selectors choose the environment: `terraform workspace select` picks the state, and `-var-file` picks the names and sizing. Nothing ties them together, so `workspace select prod` with `-var-file=dev.tfvars` plans cleanly and writes dev-named resources into prod's state. This happened once during development. A folder per environment would make `cd` the only selector, at the price of near-duplicate code. Collapsing to one selector (derive the prefix from `terraform.workspace`, key sizing by workspace) is a known follow-up.
 
